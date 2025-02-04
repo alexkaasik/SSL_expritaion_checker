@@ -1,9 +1,9 @@
 # set liocation path of your certications
-CertPath=""
+NginxEnabledPath='/etc/nginx/sites-enabled'
 
-ListOfDomains=$(ls $CertPath)
+ListOfDomains=$(ls $NginxEnabledPath)
 
-DomainList=()
+DomainConfList=()
 
 for x in $ListOfDomains
 do
@@ -12,8 +12,10 @@ done
 
 for (( i = 0; $i < ${#DomainList[@]}; i++ ))
 do
+  GetCertPath=$(cat $NginxEnabledPath/${DomainList[$i]} | grep "ssl_certificate " | sed -e "s/;//" | sed -e 's/ssl_certificate//' | tr -d ' ')
+
   # Read ssl cert info about it dates
-  test=$(openssl x509 -in $CertPath/${DomainList[$i]}/${DomainList[$i]}.crt -noout -dates)
+  test=$(openssl x509 -in $GetCertPath -noout -dates)
   test=$(echo "$test" | tr '\n' ';')
 
   # Sequence character for splitting a strings
